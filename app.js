@@ -112,3 +112,38 @@ function showResult() {
   document.getElementById('result-section').classList.remove('hidden');
   speak('よくできました！');
 }
+
+// クイズをリセットして最初から開始する
+function startQuiz() {
+  currentIndex = 0;
+  questions = generateQuiz(vehicles, QUESTION_COUNT);
+  document.getElementById('quiz-section').classList.remove('hidden');
+  document.getElementById('result-section').classList.add('hidden');
+  renderQuestion(currentIndex);
+}
+
+// vehicles.json を読み込んでクイズを開始する
+async function init() {
+  try {
+    vehicles = await loadVehicles();
+    startQuiz();
+  } catch (e) {
+    console.error(e);
+    document.body.innerHTML = '<p style="padding:2rem;font-size:24px;color:#ef4444;">データの読み込みに失敗しました。<br>サーバー経由でアクセスしてください。</p>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // quiz.html 以外のページでは何もしない
+  if (!document.getElementById('quiz-section')) return;
+
+  document.getElementById('speak-btn').addEventListener('click', () => {
+    if (questions[currentIndex]) {
+      speak(`${questions[currentIndex].correct.name} は どれ？`);
+    }
+  });
+
+  document.getElementById('replay-btn').addEventListener('click', startQuiz);
+
+  init();
+});
