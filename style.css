@@ -59,11 +59,19 @@ body {
   padding: 20px 48px;
   min-height: 80px;
   transition: transform 0.1s, opacity 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .btn:active {
   transform: scale(0.96);
   opacity: 0.85;
+}
+
+.btn,
+.vehicle-card,
+.speak-btn {
+  touch-action: manipulation;
 }
 
 .btn-start  { background: var(--color-primary); color: white; box-shadow: var(--shadow); }
@@ -100,9 +108,9 @@ body {
   background: none;
   border: 2px solid var(--color-primary);
   border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  font-size: 24px;
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -129,14 +137,17 @@ body {
   border: 4px solid transparent;
   transition: transform 0.1s;
   position: relative;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .vehicle-card:active { transform: scale(0.97); }
 
 .vehicle-card img {
   width: 100%;
-  height: 140px;
-  object-fit: cover;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #f8f8f8;
 }
 
 .vehicle-card .card-label {
@@ -151,10 +162,10 @@ body {
   display: none;
 }
 
-.vehicle-card.correct { border-color: var(--color-correct); }
+.vehicle-card.correct { border-color: var(--color-correct); border-width: 6px; background: #dcfce7; }
 .vehicle-card.correct .card-label { display: block; background: var(--color-correct); color: white; }
 
-.vehicle-card.wrong { border-color: var(--color-wrong); }
+.vehicle-card.wrong { border-color: var(--color-wrong); border-width: 6px; background: #fee2e2; }
 .vehicle-card.wrong .card-label { display: block; background: var(--color-wrong); color: white; }
 
 .vehicle-card.dimmed { opacity: 0.35; pointer-events: none; }
