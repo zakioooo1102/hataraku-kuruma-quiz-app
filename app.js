@@ -65,8 +65,10 @@ function renderQuestion(index) {
     img.draggable = false;
     img.onerror = () => {
       img.style.display = 'none';
-      card.style.fontSize = '48px';
-      card.textContent = '🚗';
+      const fallback = document.createElement('span');
+      fallback.textContent = '🚗';
+      fallback.style.fontSize = '48px';
+      card.insertBefore(fallback, label);
     };
 
     const label = document.createElement('div');
