@@ -1,0 +1,179 @@
+:root {
+  --color-bg: #fef9f0;
+  --color-primary: #f59e0b;
+  --color-correct: #16a34a;
+  --color-wrong: #ef4444;
+  --color-card-bg: #ffffff;
+  --color-text: #1e293b;
+  --color-muted: #64748b;
+  --radius: 16px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Hiragino Maru Gothic ProN', 'BIZ UDPGothic', sans-serif;
+  background: var(--color-bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Home screen ---- */
+.home-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 48px 32px;
+}
+
+.home-icon { font-size: 96px; }
+
+.home-title {
+  font-size: 40px;
+  font-weight: bold;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ---- Shared buttons ---- */
+.btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 28px;
+  padding: 20px 48px;
+  min-height: 80px;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+.btn-start  { background: var(--color-primary); color: white; box-shadow: var(--shadow); }
+.btn-replay { background: #3b82f6; color: white; box-shadow: var(--shadow); width: 100%; }
+.btn-home   { background: #e5e7eb; color: var(--color-text); width: 100%; }
+
+/* ---- Quiz screen ---- */
+.quiz-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 24px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.quiz-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.question-text {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.speak-btn {
+  background: none;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ---- Vehicle grid ---- */
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.vehicle-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  border: 4px solid transparent;
+  transition: transform 0.1s;
+  position: relative;
+}
+
+.vehicle-card:active { transform: scale(0.97); }
+
+.vehicle-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.vehicle-card .card-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  display: none;
+}
+
+.vehicle-card.correct { border-color: var(--color-correct); }
+.vehicle-card.correct .card-label { display: block; background: var(--color-correct); color: white; }
+
+.vehicle-card.wrong { border-color: var(--color-wrong); }
+.vehicle-card.wrong .card-label { display: block; background: var(--color-wrong); color: white; }
+
+.vehicle-card.dimmed { opacity: 0.35; pointer-events: none; }
+
+/* ---- Progress ---- */
+.progress-text { font-size: 20px; color: var(--color-muted); }
+
+/* ---- Result screen ---- */
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 48px 32px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.result-emoji  { font-size: 80px; }
+.result-title  { font-size: 40px; font-weight: bold; color: var(--color-correct); }
+
+.hidden { display: none !important; }
