@@ -3,7 +3,7 @@
   { "id": "kyukyusha", "name": "きゅうきゅうしゃ", "image": "images/kyukyusha.jpg" },
   { "id": "patrol",   "name": "パトカー",         "image": "images/patrol.jpg" },
   { "id": "dump",     "name": "ダンプカー",        "image": "images/dump.jpg" },
-  { "id": "crane",    "name": "クレーン車",        "image": "images/crane.jpg" },
+  { "id": "crane",    "name": "クレーンしゃ",       "image": "images/crane.jpg" },
   { "id": "bus",      "name": "バス",             "image": "images/bus.jpg" },
   { "id": "garbage",  "name": "ごみしゅうしゅうしゃ", "image": "images/garbage.jpg" },
   { "id": "taxi",     "name": "タクシー",          "image": "images/taxi.jpg" }
