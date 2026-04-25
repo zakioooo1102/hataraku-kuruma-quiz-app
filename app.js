@@ -3,8 +3,8 @@ const QUESTION_COUNT = 5;
 let vehicles = [];
 let questions = [];
 let currentIndex = 0;
+let selectedVoice = null;
 
-// 配列をランダムに並び替えて新しい配列を返す（元の配列は変更しない）
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -14,25 +14,34 @@ function shuffle(arr) {
   return a;
 }
 
-// Web Speech API でテキストを日本語読み上げ
+function initVoice() {
+  if (!window.speechSynthesis) return;
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = ['Kyoko', 'O-ren', 'Google 日本語', 'Microsoft Nanami Online', 'Hattori'];
+  for (const name of preferred) {
+    const v = voices.find(v => v.name.includes(name));
+    if (v) { selectedVoice = v; return; }
+  }
+  selectedVoice = voices.find(v => v.lang.startsWith('ja')) || null;
+}
+
 function speak(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = 'ja-JP';
   utt.rate = 0.85;
+  utt.pitch = 1.1;
+  if (selectedVoice) utt.voice = selectedVoice;
   window.speechSynthesis.speak(utt);
 }
 
-// vehicles.json を fetch で読み込んで配列を返す
 async function loadVehicles() {
   const res = await fetch('data/vehicles.json');
   if (!res.ok) throw new Error('vehicles.json の読み込みに失敗しました');
   return res.json();
 }
 
-// count 問分のクイズ配列を生成する
-// 戻り値: [{ correct: vehicle, choices: [v1, v2, v3, v4] }, ...]
 function generateQuiz(allVehicles, count) {
   if (allVehicles.length < count) throw new Error(`車データが${count}件未満です`);
   if (allVehicles.length < 4) throw new Error('選択肢が4枚必要です');
@@ -45,10 +54,9 @@ function generateQuiz(allVehicles, count) {
   });
 }
 
-// 指定インデックスの問題をDOMに描画しTTSで読み上げる
 function renderQuestion(index) {
   const q = questions[index];
-  document.getElementById('question-text').textContent = `${q.correct.name} は どれ？`;
+  document.getElementById('question-text').textContent = q.correct.name;
   document.getElementById('progress').textContent = `問題 ${index + 1} / ${questions.length}`;
 
   const grid = document.getElementById('vehicle-grid');
@@ -63,6 +71,10 @@ function renderQuestion(index) {
     img.src = vehicle.image;
     img.alt = vehicle.name;
     img.draggable = false;
+
+    const label = document.createElement('div');
+    label.className = 'card-label';
+
     img.onerror = () => {
       img.style.display = 'none';
       const fallback = document.createElement('span');
@@ -71,44 +83,29 @@ function renderQuestion(index) {
       card.insertBefore(fallback, label);
     };
 
-    const label = document.createElement('div');
-    label.className = 'card-label';
-
     card.appendChild(img);
     card.appendChild(label);
     card.addEventListener('click', () => handleTap(vehicle.id));
     grid.appendChild(card);
   });
 
-  speak(`${q.correct.name} は どれ？`);
+  speak(q.correct.name);
 }
 
-// 車カードがタップされた時の処理
 function handleTap(tappedId) {
   const q = questions[currentIndex];
   const cards = document.querySelectorAll('.vehicle-card');
   const tappedCard = [...cards].find(c => c.dataset.id === tappedId);
 
-  // 既にwrongマーク済みのカードは無視
   if (!tappedCard || tappedCard.classList.contains('wrong')) return;
 
   if (tappedId === q.correct.id) {
-    // 正解
     tappedCard.classList.add('correct');
     tappedCard.style.pointerEvents = 'none';
     tappedCard.querySelector('.card-label').textContent = `⭕️ ${q.correct.name}`;
     cards.forEach(c => { if (c.dataset.id !== tappedId) c.classList.add('dimmed'); });
-    speak(`せいかい！ ${q.correct.name} だよ`);
-    setTimeout(() => {
-      currentIndex++;
-      if (currentIndex >= QUESTION_COUNT) {
-        showResult();
-      } else {
-        renderQuestion(currentIndex);
-      }
-    }, 1500);
+    showCorrectOverlay(q.correct.name);
   } else {
-    // 不正解
     const vehicle = q.choices.find(v => v.id === tappedId);
     tappedCard.classList.add('wrong');
     tappedCard.querySelector('.card-label').textContent = `❌ ${vehicle.name}`;
@@ -116,50 +113,71 @@ function handleTap(tappedId) {
   }
 }
 
-// クイズセクションを隠して結果セクションを表示する
-function showResult() {
+function showCorrectOverlay(name) {
+  document.getElementById('correct-name').textContent = name;
   document.getElementById('quiz-section').classList.add('hidden');
+  document.getElementById('correct-overlay').classList.remove('hidden');
+}
+
+function hideCorrectOverlay() {
+  document.getElementById('correct-overlay').classList.add('hidden');
+  currentIndex++;
+  if (currentIndex >= questions.length) {
+    showResult();
+  } else {
+    document.getElementById('quiz-section').classList.remove('hidden');
+    renderQuestion(currentIndex);
+  }
+}
+
+function showResult() {
   document.getElementById('result-section').classList.remove('hidden');
   speak('よくできました！');
 }
 
-// クイズをリセットして最初から開始する
 function startQuiz() {
   currentIndex = 0;
   questions = generateQuiz(vehicles, QUESTION_COUNT);
+  document.getElementById('home-section').classList.add('hidden');
   document.getElementById('quiz-section').classList.remove('hidden');
   document.getElementById('result-section').classList.add('hidden');
+  document.getElementById('correct-overlay').classList.add('hidden');
   renderQuestion(currentIndex);
 }
 
-// vehicles.json を読み込んでクイズを開始する
 async function init() {
   try {
-    vehicles = await loadVehicles();
-    startQuiz();
+    if (vehicles.length === 0) {
+      vehicles = await loadVehicles();
+    }
   } catch (e) {
     console.error(e);
     document.body.innerHTML = '<p style="padding:2rem;font-size:24px;color:#ef4444;">データの読み込みに失敗しました。<br>サーバー経由でアクセスしてください。</p>';
+    return;
   }
+  startQuiz();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // quiz.html 以外のページでは何もしない
-  if (!document.getElementById('quiz-section')) return;
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = initVoice;
+    initVoice();
+  }
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    init(); // ユーザーアクション内で呼ぶことでiOS SafariのTTSが動作する
+  });
 
   document.getElementById('speak-btn').addEventListener('click', () => {
-    if (questions[currentIndex]) {
-      speak(`${questions[currentIndex].correct.name} は どれ？`);
-    }
+    if (questions[currentIndex]) speak(questions[currentIndex].correct.name);
   });
+
+  document.getElementById('next-btn').addEventListener('click', hideCorrectOverlay);
 
   document.getElementById('replay-btn').addEventListener('click', startQuiz);
 
-  // iOS Safari requires TTS to be triggered from a user gesture.
-  // Show a tap-to-start overlay so init() runs inside a gesture handler.
-  const overlay = document.getElementById('start-overlay');
-  overlay.addEventListener('click', () => {
-    overlay.style.display = 'none';
-    init();
-  }, { once: true });
+  document.getElementById('home-btn').addEventListener('click', () => {
+    document.getElementById('result-section').classList.add('hidden');
+    document.getElementById('home-section').classList.remove('hidden');
+  });
 });
