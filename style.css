@@ -188,3 +188,23 @@ body {
 .result-title  { font-size: 40px; font-weight: bold; color: var(--color-correct); }
 
 .hidden { display: none !important; }
+
+/* ---- Start overlay (iOS Safari TTS gesture gate) ---- */
+.start-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.start-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}

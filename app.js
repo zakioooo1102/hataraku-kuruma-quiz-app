@@ -34,6 +34,8 @@ async function loadVehicles() {
 // count 問分のクイズ配列を生成する
 // 戻り値: [{ correct: vehicle, choices: [v1, v2, v3, v4] }, ...]
 function generateQuiz(allVehicles, count) {
+  if (allVehicles.length < count) throw new Error(`車データが${count}件未満です`);
+  if (allVehicles.length < 4) throw new Error('選択肢が4枚必要です');
   const pool = shuffle(allVehicles);
   const correctVehicles = pool.slice(0, count);
   return correctVehicles.map(correct => {
@@ -47,7 +49,7 @@ function generateQuiz(allVehicles, count) {
 function renderQuestion(index) {
   const q = questions[index];
   document.getElementById('question-text').textContent = `${q.correct.name} は どれ？`;
-  document.getElementById('progress').textContent = `問題 ${index + 1} / ${QUESTION_COUNT}`;
+  document.getElementById('progress').textContent = `問題 ${index + 1} / ${questions.length}`;
 
   const grid = document.getElementById('vehicle-grid');
   grid.innerHTML = '';
@@ -61,6 +63,11 @@ function renderQuestion(index) {
     img.src = vehicle.image;
     img.alt = vehicle.name;
     img.draggable = false;
+    img.onerror = () => {
+      img.style.display = 'none';
+      card.style.fontSize = '48px';
+      card.textContent = '🚗';
+    };
 
     const label = document.createElement('div');
     label.className = 'card-label';
@@ -86,6 +93,7 @@ function handleTap(tappedId) {
   if (tappedId === q.correct.id) {
     // 正解
     tappedCard.classList.add('correct');
+    tappedCard.style.pointerEvents = 'none';
     tappedCard.querySelector('.card-label').textContent = `⭕️ ${q.correct.name}`;
     cards.forEach(c => { if (c.dataset.id !== tappedId) c.classList.add('dimmed'); });
     speak(`せいかい！ ${q.correct.name} だよ`);
@@ -145,5 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('replay-btn').addEventListener('click', startQuiz);
 
-  init();
+  // iOS Safari requires TTS to be triggered from a user gesture.
+  // Show a tap-to-start overlay so init() runs inside a gesture handler.
+  const overlay = document.getElementById('start-overlay');
+  overlay.addEventListener('click', () => {
+    overlay.style.display = 'none';
+    init();
+  }, { once: true });
 });
