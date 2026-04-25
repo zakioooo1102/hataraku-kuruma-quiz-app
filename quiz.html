@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#fef9f0">
   <title>はたらくくるま クイズ</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,17 +14,17 @@
   <!-- クイズセクション -->
   <div id="quiz-section" class="quiz-screen">
     <div class="quiz-header">
-      <div id="question-text" class="question-text"></div>
+      <p id="question-text" class="question-text" aria-live="polite"></p>
       <button id="speak-btn" class="speak-btn" aria-label="もう一度聞く">🔊</button>
     </div>
     <div id="vehicle-grid" class="vehicle-grid"></div>
-    <div id="progress" class="progress-text"></div>
+    <div id="progress" class="progress-text" aria-live="polite"></div>
   </div>
 
   <!-- 結果セクション（初期は非表示） -->
   <div id="result-section" class="result-screen hidden">
     <div class="result-emoji">🎉</div>
-    <div class="result-title">よくできました！</div>
+    <h2 class="result-title">よくできました！</h2>
     <button id="replay-btn" class="btn btn-replay">🔁 もう一度あそぶ</button>
     <a href="index.html" class="btn btn-home">🏠 おわる</a>
   </div>
