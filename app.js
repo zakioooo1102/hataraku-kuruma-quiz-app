@@ -25,6 +25,25 @@ function initVoice() {
   selectedVoice = voices.find(v => v.lang.startsWith('ja')) || null;
 }
 
+function playPinpon() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    [[880, now, 0.35], [659, now + 0.28, 0.45]].forEach(([freq, start, dur]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.4, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      osc.start(start);
+      osc.stop(start + dur);
+    });
+  } catch (e) {}
+}
+
 function speak(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
@@ -104,7 +123,8 @@ function handleTap(tappedId) {
     tappedCard.style.pointerEvents = 'none';
     tappedCard.querySelector('.card-label').textContent = `⭕️ ${q.correct.name}`;
     cards.forEach(c => { if (c.dataset.id !== tappedId) c.classList.add('dimmed'); });
-    showCorrectOverlay(q.correct.name);
+    playPinpon();
+    showCorrectOverlay(q.correct.name, q.correct.image);
   } else {
     const vehicle = q.choices.find(v => v.id === tappedId);
     tappedCard.classList.add('wrong');
@@ -113,8 +133,9 @@ function handleTap(tappedId) {
   }
 }
 
-function showCorrectOverlay(name) {
+function showCorrectOverlay(name, image) {
   document.getElementById('correct-name').textContent = name;
+  document.getElementById('correct-img').src = image;
   document.getElementById('quiz-section').classList.add('hidden');
   document.getElementById('correct-overlay').classList.remove('hidden');
 }
