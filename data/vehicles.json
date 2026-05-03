@@ -52,5 +52,21 @@
   { "id": "cranesha",         "name": "クレーンしゃ",             "image": "images/cranesha.jpg" },
   { "id": "concrete_mixer",   "name": "コンクリートミキサーしゃ",  "image": "images/concrete_mixer.jpg" },
   { "id": "concrete_pump",    "name": "コンクリートポンプしゃ",    "image": "images/concrete_pump.jpg" },
-  { "id": "kosho_sagyo",      "name": "こうしょさぎょうしゃ",      "image": "images/kosho_sagyo.jpg" }
+  { "id": "kosho_sagyo",      "name": "こうしょさぎょうしゃ",      "image": "images/kosho_sagyo.jpg" },
+
+  { "id": "sowan_sagyo",      "name": "そうわんさぎょうしゃ",      "image": "images/sowan_sagyo.jpg" },
+  { "id": "shobo_kyukyu",     "name": "しょうぼうきゅうきゅうしゃ", "image": "images/shobo_kyukyu.jpg" },
+  { "id": "log_loader",       "name": "ログローダー",              "image": "images/log_loader.jpg" },
+  { "id": "pile_driver",      "name": "パイルドライバー",           "image": "images/pile_driver.jpg" },
+  { "id": "kani_crane",       "name": "カニクレーン",              "image": "images/kani_crane.jpg" },
+  { "id": "rough_crane",      "name": "ラフテレンクレーン",         "image": "images/rough_crane.jpg" },
+  { "id": "bottle_car",       "name": "ボトルカー",                "image": "images/bottle_car.jpg" },
+  { "id": "dobutsu_unban",    "name": "どうぶつうんぱんしゃ",       "image": "images/dobutsu_unban.jpg" },
+  { "id": "ido_toshokan",     "name": "いどうとしょかんしゃ",       "image": "images/ido_toshokan.jpg" },
+  { "id": "ido_shinryo",      "name": "いどうしんりょうしゃ",       "image": "images/ido_shinryo.jpg" },
+  { "id": "ido_kenketsu",     "name": "いどうけんけつしゃ",         "image": "images/ido_kenketsu.jpg" },
+  { "id": "harvester",        "name": "ハーベスター",              "image": "images/harvester.jpg" },
+  { "id": "tractor",          "name": "トラクター",                "image": "images/tractor.jpg" },
+  { "id": "tarappu_sha",      "name": "タラップしゃ",              "image": "images/tarappu_sha.jpg" },
+  { "id": "towing_tractor",   "name": "トーイングトラクター",        "image": "images/towing_tractor.jpg" }
 ]
