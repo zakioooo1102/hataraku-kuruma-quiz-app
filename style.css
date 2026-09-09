@@ -1,232 +1,552 @@
 :root {
-  --color-bg: #fef9f0;
-  --color-primary: #f59e0b;
-  --color-correct: #16a34a;
-  --color-wrong: #ef4444;
-  --color-card-bg: #ffffff;
-  --color-text: #1e293b;
-  --color-muted: #64748b;
-  --radius: 16px;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --sky:#edf6f8;
+  --ink:#243c4a;
+  --muted:#536e7c;
+  --yellow:#ffd24b;
+  --blue:#247091;
+  --green:#267a57;
+  --white:#fff;
+  font-family:'Hiragino Maru Gothic ProN','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  color:var(--ink);
+  background:var(--sky);
+  font-synthesis:none;
 }
-
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  box-sizing:border-box;
 }
-
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
-
 body {
-  font-family: 'Hiragino Maru Gothic ProN', 'BIZ UDPGothic', sans-serif;
-  background: var(--color-bg);
-  height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin:0;
+  min-height:100dvh;
 }
-
-/* ---- Home screen ---- */
+button,a {
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+button {
+  font:inherit;
+  cursor:pointer;
+  color:inherit;
+}
+button:disabled {
+  cursor:default;
+}
+button:focus-visible,a:focus-visible {
+  outline:4px solid var(--blue);
+  outline-offset:5px;
+}
+button:active:not(:disabled) {
+  transform:translateY(3px);
+}
+.hidden {
+  display:none!important;
+}
+.app-header {
+  max-width:1120px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:24px 36px;
+}
+.brand {
+  text-decoration:none;
+  color:var(--ink);
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.brand span {
+  color:var(--blue);
+  font-size:25px;
+  margin-right:7px;
+}
+.tool-btn {
+  border:1px solid #cedee4;
+  background:transparent;
+  border-radius:24px;
+  min-height:44px;
+  padding:8px 17px;
+  font-size:13px;
+  font-weight:700;
+}
+.tool-btn span {
+  margin-left:8px;
+  font-size:20px;
+}
+main {
+  max-width:1024px;
+  margin:auto;
+  padding:10px 32px 36px;
+}
 .home-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 48px 32px;
+  text-align:center;
 }
-
-.home-icon { font-size: 96px; }
-
-.home-title {
-  font-size: 40px;
-  font-weight: bold;
-  color: var(--color-text);
-  text-align: center;
-  line-height: 1.4;
+.intro {
+  font-weight:700;
+  font-size:16px;
+  letter-spacing:.12em;
+  margin:18px 0;
 }
-
-/* ---- Shared buttons ---- */
+.home-copy h1 {
+  font-size:clamp(32px,5vw,54px);
+  letter-spacing:.04em;
+  line-height:1.4;
+  margin:12px 0;
+  font-weight:900;
+}
+.home-copy h1 span {
+  display:block;
+  font-size:clamp(44px,6.3vw,72px);
+  letter-spacing:.12em;
+}
 .btn {
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--radius);
-  font-family: inherit;
-  font-weight: bold;
-  font-size: 28px;
-  padding: 20px 48px;
-  min-height: 80px;
-  transition: transform 0.1s, opacity 0.1s;
-  -webkit-user-select: none;
-  user-select: none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:30px;
+  border:0;
+  border-radius:20px;
+  min-height:72px;
+  padding:18px 38px;
+  font-weight:800;
+  font-size:25px;
+  max-width:100%;
+  margin-inline:auto;
 }
-
-.btn:active {
-  transform: scale(0.96);
-  opacity: 0.85;
+.btn-primary {
+  background:var(--yellow);
+  box-shadow:0 5px 0 #d7a72d;
+  color:var(--ink);
+  min-width:300px;
 }
-
-.btn,
-.vehicle-card,
-.speak-btn {
-  touch-action: manipulation;
+.btn-primary:disabled {
+  opacity:.6;
 }
-
-.btn-start  { background: var(--color-primary); color: white; box-shadow: var(--shadow); }
-.btn-replay { background: #3b82f6; color: white; box-shadow: var(--shadow); width: 100%; }
-.btn-home   { background: #e5e7eb; color: var(--color-text); width: 100%; }
-.btn-next   { background: white; color: var(--color-correct); box-shadow: var(--shadow); }
-
-/* ---- Quiz screen ---- */
+.btn span {
+  font-size:21px;
+}
+.home-note {
+  font-size:14px;
+  font-weight:700;
+  color:var(--muted);
+  margin-top:23px;
+}
+.parent-note {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:34px;
+}
 .quiz-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  width: 100%;
-  max-width: 600px;
-  height: 100dvh;
+  max-width:850px;
+  margin:auto;
 }
-
+.quiz-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:26px;
+}
+.text-btn {
+  background:transparent;
+  border:0;
+  padding:12px;
+  min-height:48px;
+  font-size:15px;
+  font-weight:700;
+}
+.progress-track {
+  display:flex;
+  gap:10px;
+}
+.progress-stop {
+  width:30px;
+  height:10px;
+  border-radius:10px;
+  background:#d3e2e7;
+}
+.progress-stop.done {
+  background:var(--green);
+}
+.progress-stop.current {
+  background:var(--yellow);
+}
+.question-count {
+  font-size:14px;
+  font-weight:800;
+}
 .quiz-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  justify-content: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:24px;
+  text-align:center;
+  margin-bottom:24px;
+  min-height:92px;
 }
-
-.question-text {
-  font-size: 32px;
-  font-weight: bold;
-  color: var(--color-text);
-  text-align: center;
+.question-hint {
+  font-size:16px;
+  color:var(--muted);
+  margin:0 0 8px;
 }
-
+.quiz-header h1 {
+  font-size:clamp(23px,3.8vw,38px);
+  margin:0;
+  overflow-wrap:anywhere;
+}
 .speak-btn {
-  background: none;
-  border: 2px solid var(--color-primary);
-  border-radius: 50%;
-  width: 72px;
-  height: 72px;
-  font-size: 28px;
-  cursor: pointer;
-  flex-shrink: 0;
+  border:2px solid #c6dce5;
+  background:white;
+  border-radius:50%;
+  width:72px;
+  height:72px;
+  flex-shrink:0;
+  color:var(--blue);
+  font-size:27px;
 }
-
-/* ---- Vehicle grid ---- */
+.speak-btn small {
+  display:block;
+  font-size:11px;
+  font-weight:700;
+}
 .vehicle-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 12px;
-  width: 100%;
-  flex: 1;
-  min-height: 0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
 }
-
 .vehicle-card {
-  background: var(--color-card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: hidden;
-  border: 4px solid transparent;
-  transition: transform 0.1s;
-  position: relative;
-  -webkit-user-select: none;
-  user-select: none;
+  position:relative;
+  border:3px solid white;
+  background:white;
+  border-radius:23px;
+  box-shadow:0 4px 0 #d4e3e9;
+  padding:16px;
+  aspect-ratio:1.55;
+  overflow:hidden;
+  min-width:0;
 }
-
-.vehicle-card:active { transform: scale(0.97); }
-
 .vehicle-card img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+}
+.vehicle-card:hover:not(:disabled) {
+  border-color:#a4c9d9;
+}
+.card-label {
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  font-size:13px;
+  padding:8px;
+  background:#e8f0f4;
+  display:none;
+  font-weight:700;
+}
+.vehicle-card.wrong {
+  background:#eff3f4;
+  border-color:#ccdce3;
+}
+.vehicle-card.wrong img {
+  opacity:.55;
+}
+.vehicle-card.wrong .card-label {
+  display:block;
+}
+.feedback {
+  text-align:center;
+  color:var(--muted);
+  font-size:15px;
+  font-weight:700;
+  margin:24px 0;
+}
+.correct-screen,.result-screen {
+  text-align:center;
+  padding-top:20px;
+}
+.success-badge {
+  display:grid;
+  place-items:center;
+  width:68px;
+  height:68px;
+  background:var(--green);
+  border-radius:50%;
+  color:white;
+  font-size:44px;
+  font-weight:800;
+  margin:auto;
+}
+.correct-screen h1,.result-screen h1 {
+  font-size:clamp(30px,5vw,46px);
+  margin:14px 0 8px;
+}
+.success-note {
+  color:var(--green);
+  font-weight:700;
+  margin:0;
+}
+.found-vehicle {
+  background:white;
+  border-radius:28px;
+  max-width:460px;
+  margin:26px auto;
+  padding:24px;
+}
+.found-vehicle img {
+  width:100%;
+  height:210px;
+  object-fit:contain;
+}
+.found-vehicle h2 {
+  font-size:24px;
+  margin:16px 0 0;
+}
+.result-stars {
+  color:#ad7800;
+  font-size:48px;
+  letter-spacing:12px;
+}
+.result-note {
+  color:var(--muted);
+}
+.collection {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  margin:30px auto;
+  max-width:760px;
+}
+.collection figure {
+  margin:0;
+  background:white;
+  border-radius:16px;
+  padding:14px 10px;
+  width:calc(33.333% - 12px);
+}
+.collection img {
+  width:100%;
+  height:110px;
+  object-fit:contain;
+}
+.collection figcaption {
+  font-size:13px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+  margin-top:8px;
+}
+.result-screen>.text-btn {
+  margin-top:20px;
+}
+dialog {
+  border:0;
+  border-radius:24px;
+  color:var(--ink);
+  max-width:min(440px,90vw);
+  padding:28px;
+  text-align:center;
+}
+dialog::backdrop {
+  background:#243c4a80;
+}
+dialog h2 {
+  font-size:24px;
+}
+dialog p {
+  font-size:15px;
+  line-height:1.8;
+}
+dialog .btn {
+  min-width:0;
+  width:100%;
+  font-size:22px;
+}
+dialog .text-btn {
+  margin-top:16px;
+}
+@media(min-width:800px) and (min-height:850px) {
+  .home-screen {
+    padding-top:35px;
+  }
+}
+@media(max-width:600px) {
+  .app-header {
+    padding:16px 20px;
+  }
+  .brand {
+    font-size:12px;
+  }
+  .tool-btn {
+    padding:6px 12px;
+  }
+  main {
+    padding:4px 18px 26px;
+  }
+  .intro {
+    font-size:13px;
+    margin-top:16px;
+  }
+  .btn {
+    font-size:23px;
+    min-width:270px;
+    min-height:68px;
+  }
+  .home-note {
+    font-size:12px;
+    line-height:1.7;
+  }
+  .parent-note {
+    font-size:10px;
+    margin-top:25px;
+  }
+  .quiz-top {
+    margin-bottom:16px;
+    gap:8px;
+  }
+  .progress-track {
+    gap:6px;
+  }
+  .progress-stop {
+    width:23px;
+    height:9px;
+  }
+  .quiz-top .text-btn {
+    font-size:13px;
+    padding-left:0;
+  }
+  .quiz-header {
+    gap:12px;
+    margin-bottom:18px;
+    min-height:80px;
+  }
+  .speak-btn {
+    width:60px;
+    height:60px;
+  }
+  .vehicle-grid {
+    gap:12px;
+  }
+  .vehicle-card {
+    aspect-ratio:1.04;
+    padding:10px;
+    border-radius:18px;
+  }
+  .feedback {
+    font-size:13px;
+  }
+  .found-vehicle img {
+    height:190px;
+  }
+  .found-vehicle {
+    padding:20px;
+    margin:22px auto;
+  }
+  .found-vehicle h2 {
+    font-size:21px;
+  }
+  .correct-screen {
+    padding-top:8px;
+  }
+  .collection {
+    gap:10px;
+    margin-block:24px;
+  }
+  .collection figure {
+    width:calc(50% - 5px);
+  }
+  .collection img {
+    height:85px;
+  }
+  .result-screen {
+    padding-top:8px;
+  }
+  .result-stars {
+    font-size:36px;
+  }
+  .result-screen h1 {
+    font-size:30px;
+  }
+}
+@media(prefers-reduced-motion:no-preference) {
+  .vehicle-card,.btn {
+    transition:transform .15s,border-color .15s;
+  }
+  .success-badge {
+    animation:pop .28s ease-out;
+  }
+  @keyframes pop {
+    from {
+      transform:scale(.7);
+    }
+    to {
+      transform:scale(1);
+    }
+  }
+}
+
+/* Picture-book entrance: bold vehicles, playful lettering, one obvious action. */
+body:has(.home-screen:not(.hidden)) {
+  background: #fffdf5;
+}
+.home-screen {
+  max-width: 780px;
+  margin-inline: auto;
+  padding-top: 4px;
+}
+.home-copy .intro {
+  color: #48605a;
+  font-size: 15px;
+  margin: 10px 0 14px;
+}
+.home-copy h1 {
+  color: #215c83;
+  font-size: clamp(30px, 4.3vw, 48px);
+  font-weight: 900;
+  line-height: 1.35;
+  margin: 0;
+  letter-spacing: .035em;
+}
+.home-copy h1 span {
+  color: #c34431;
+  font-size: clamp(52px, 6.7vw, 74px);
+  letter-spacing: .13em;
+  text-shadow: 3px 3px 0 #ffe6a3;
+  transform: rotate(-3deg);
+  margin-top: 3px;
+}
+.vehicle-illustration {
+  max-width: 600px;
+  margin: 0 auto 8px;
+}
+.vehicle-illustration img {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #f8f8f8;
+  height: auto;
+  mix-blend-mode: multiply;
 }
-
-.vehicle-card .card-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 4px 8px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  display: none;
+.home-screen .btn-primary {
+  background: #ffd34b;
+  border: 3px solid #243c4a;
+  border-radius: 999px;
+  box-shadow: 0 6px 0 #243c4a;
+  min-width: 320px;
+  font-size: 28px;
+  min-height: 78px;
+  gap: 40px;
 }
-
-.vehicle-card.correct { border-color: var(--color-correct); border-width: 6px; background: #dcfce7; }
-.vehicle-card.correct .card-label { display: block; background: var(--color-correct); color: white; }
-
-.vehicle-card.wrong { border-color: var(--color-wrong); border-width: 6px; background: #fee2e2; }
-.vehicle-card.wrong .card-label { display: block; background: var(--color-wrong); color: white; }
-
-.vehicle-card.dimmed { opacity: 0.35; pointer-events: none; }
-
-/* ---- Progress ---- */
-.progress-text { font-size: 20px; color: var(--color-muted); }
-
-/* ---- Result screen ---- */
-.result-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 48px 32px;
-  width: 100%;
-  max-width: 400px;
+.home-screen .home-note {
+  margin-top: 23px;
 }
-
-.result-emoji  { font-size: 80px; }
-.result-title  { font-size: 40px; font-weight: bold; color: var(--color-correct); }
-
-.hidden { display: none !important; }
-
-/* ---- Correct answer overlay ---- */
-.correct-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--color-correct);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+.home-screen .parent-note {
+  margin-top: 22px;
 }
-
-.correct-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 48px 32px;
-  text-align: center;
-}
-
-.correct-mark  { font-size: 120px; line-height: 1; }
-.correct-label { font-size: 64px; font-weight: bold; color: white; }
-.correct-name  { font-size: 40px; font-weight: bold; color: white; opacity: 0.9; }
-
-.correct-img {
-  width: 260px;
-  height: 195px;
-  object-fit: contain;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.15);
+@media (max-width: 600px) {
+  .home-screen { padding-top: 14px; }
+  .home-copy .intro { font-size: 12px; margin: 4px 0 14px; }
+  .vehicle-illustration { margin: 12px -10px 18px; }
+  .home-screen .btn-primary { min-width: min(290px, 100%); font-size: 26px; min-height: 74px; }
+  .home-screen .parent-note { margin-top: 24px; }
 }

@@ -2,65 +2,30 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#fef9f0">
+  <meta name="theme-color" content="#edf6f8">
   <title>はたらくくるま クイズ</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- ホーム画面 -->
-  <div id="home-section" class="home-screen">
-    <div class="home-icon">🚗</div>
-    <h1 class="home-title">はたらくくるま<br>クイズ</h1>
-    <button id="start-btn" class="btn btn-start">🎮 はじめる</button>
-  </div>
-
-  <!-- クイズセクション -->
-  <div id="quiz-section" class="quiz-screen hidden">
-    <div class="quiz-header">
-      <p id="question-text" class="question-text" aria-live="polite"></p>
-      <button id="speak-btn" class="speak-btn" aria-label="もう一度聞く">🔊</button>
-    </div>
-    <div id="vehicle-grid" class="vehicle-grid"></div>
-    <div id="progress" class="progress-text" aria-live="polite"></div>
-  </div>
-
-  <!-- 正解オーバーレイ -->
-  <div id="correct-overlay" class="correct-overlay hidden">
-    <div class="correct-content">
-      <div class="correct-mark">⭕️</div>
-      <div class="correct-label">せいかい！</div>
-      <img id="correct-img" class="correct-img" alt="">
-      <div id="correct-name" class="correct-name"></div>
-      <button id="next-btn" class="btn btn-next">つぎのもんだいへ ▶</button>
-    </div>
-  </div>
-
-  <!-- 結果画面 -->
-  <div id="result-section" class="result-screen hidden">
-    <div class="result-emoji">🎉</div>
-    <h2 class="result-title">よくできました！</h2>
-    <button id="replay-btn" class="btn btn-replay">🔁 もう一度あそぶ</button>
-    <button id="home-btn" class="btn btn-home">🏠 おわる</button>
-  </div>
-
+  <header class="app-header"><a href="./" class="brand" aria-label="はたらくくるまクイズ ホーム"><span aria-hidden="true">▰</span> くるまの ひろば</a><button id="sound-btn" class="tool-btn" aria-label="おとを消す" aria-pressed="false">おと ON <span aria-hidden="true">♫</span></button></header>
+  <main>
+    <section id="home-section" class="home-screen" aria-labelledby="home-title">
+      <div class="home-copy"><p class="intro">きみの すきな くるまは どれ？</p><h1 id="home-title">はたらくくるま<span>クイズ</span></h1></div>
+      <div class="vehicle-illustration"><img src="images/home-vehicles.png" alt="黄色いショベルカー、赤いはしご車、白い救急車のイラスト" width="1536" height="1024" fetchpriority="high"></div>
+      <button id="start-btn" class="btn btn-primary" disabled>じゅんびちゅう…</button><p id="load-status" class="home-note" role="status">おとを きいて、くるまを タッチ。ぜんぶで 5もん！</p>
+      <p class="parent-note">おうちの方へ：文字が読めなくても、音声で遊べます。</p>
+    </section>
+    <section id="quiz-section" class="quiz-screen hidden" aria-label="クイズ">
+      <div class="quiz-top"><button id="quit-btn" class="text-btn">⌂ もどる</button><div id="progress" class="progress-track" aria-label="進み具合"></div><span id="question-count" class="question-count"></span></div>
+      <div class="quiz-header"><div><p class="question-hint">どーこだ？</p><h1 id="question-text" tabindex="-1"></h1></div><button id="speak-btn" class="speak-btn" aria-label="もういちど きく">♫<small>きく</small></button></div>
+      <div id="vehicle-grid" class="vehicle-grid"></div><p id="feedback" class="feedback" role="status">これかな？と おもったら タッチ！</p>
+    </section>
+    <section id="correct-overlay" class="correct-screen hidden" aria-labelledby="correct-label"><div class="success-badge" aria-hidden="true">✓</div><h1 id="correct-label" tabindex="-1">せいかい！</h1><p class="success-note">みつけたね！</p><div class="found-vehicle"><img id="correct-img" alt=""><h2 id="correct-name"></h2></div><button id="next-btn" class="btn btn-primary">つぎへ すすむ <span>▶</span></button></section>
+    <section id="result-section" class="result-screen hidden" aria-labelledby="result-title"><div class="result-stars" aria-hidden="true">★ ★ ★</div><p class="intro">ぜんぶ みつけたね！</p><h1 id="result-title" tabindex="-1">よくできました！</h1><p class="result-note">きょうの くるまが そろったよ。</p><div id="collection" class="collection"></div><button id="replay-btn" class="btn btn-primary">もういちど あそぶ <span>↻</span></button><button id="home-btn" class="text-btn">⌂ はじめに もどる</button></section>
+  </main>
+  <dialog id="exit-dialog"><h2>ひとやすみ する？</h2><p>はじめに もどると、あたらしい もんだいになるよ。</p><button id="continue-btn" class="btn btn-primary">つづける</button><button id="exit-btn" class="text-btn">はじめに もどる</button></dialog>
   <script src="app.js"></script>
-  <script>
-    // ピンチズーム防止（iOS 10+対応）
-    document.addEventListener('touchmove', function(e) {
-      if (e.touches.length > 1) e.preventDefault();
-    }, { passive: false });
-
-    // ダブルタップズーム防止
-    let lastTap = 0;
-    document.addEventListener('touchend', function(e) {
-      const now = Date.now();
-      if (now - lastTap < 300) e.preventDefault();
-      lastTap = now;
-    }, { passive: false });
-  </script>
 </body>
 </html>
