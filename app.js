@@ -7,14 +7,66 @@ let selectedVoice = null;
 let muted = false;
 let answered = false;
 let audioContext;
+let wrongIds = [];
+const SESSION_KEY = 'kuruma-session-v1';
+const SOUND_KEY = 'kuruma-muted-v1';
+function readStored(key) {
+  try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; }
+}
+function storeValue(key, value) {
+  try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* Playing also works without storage. */ }
+}
+function saveSession() {
+  storeValue(SESSION_KEY, questions.length && currentIndex < questions.length ? {
+    questions: questions.map(q => ({ correct: q.correct.id, choices: q.choices.map(v => v.id) })),
+    currentIndex, answered, wrongIds,
+  } : null);
+}
+function restoreSession() {
+  const saved = readStored(SESSION_KEY);
+  if (!saved || !Array.isArray(saved.questions) || saved.questions.length !== QUESTION_COUNT ||
+      !Number.isInteger(saved.currentIndex) || saved.currentIndex < 0 || saved.currentIndex >= QUESTION_COUNT ||
+      typeof saved.answered !== 'boolean' || !Array.isArray(saved.wrongIds)) return false;
+  const byId = new Map(vehicles.map(v => [v.id, v]));
+  if (saved.questions.some(q => !q || !byId.has(q.correct) || !Array.isArray(q.choices) ||
+      q.choices.length !== 4 || new Set(q.choices).size !== 4 || !q.choices.includes(q.correct) ||
+      q.choices.some(id => !byId.has(id))) || new Set(saved.questions.map(q => q.correct)).size !== QUESTION_COUNT) return false;
+  const active = saved.questions[saved.currentIndex];
+  if (saved.wrongIds.some(id => id === active.correct || !active.choices.includes(id))) return false;
+  questions = saved.questions.map(q => ({ correct: byId.get(q.correct), choices: q.choices.map(id => byId.get(id)) }));
+  currentIndex = saved.currentIndex;
+  answered = saved.answered;
+  wrongIds = saved.wrongIds;
+  return true;
+}
+function hasSession() { return questions.length > 0 && currentIndex < questions.length; }
+function updateHome() {
+  $('resume-btn').classList.toggle('hidden', !hasSession());
+  $('start-btn').classList.toggle('secondary-start', hasSession());
+  $('start-btn').innerHTML = hasSession() ? 'はじめから あそぶ' : 'はじめる <span>▶</span>';
+  $('resume-note').textContent = hasSession() ? `${currentIndex + (answered ? 1 : 0)}だい みつけたよ。つづきから あそべるよ。` : '';
+}
+function resumeQuiz() {
+  if (!hasSession()) return;
+  if (answered) {
+    const v = questions[currentIndex].correct;
+    showCorrectOverlay(v.name, v.image);
+    showScreen('correct-overlay');
+  } else {
+    showScreen('quiz-section');
+    renderQuestion(currentIndex);
+  }
+}
 const $ = id => document.getElementById(id);
 function showScreen(id) {
   ['home-section','quiz-section','correct-overlay','result-section'].forEach(screen => $(screen).classList.toggle('hidden', screen !== id));
 }
 function goHome() {
   window.speechSynthesis?.cancel();
+  saveSession();
   showScreen('home-section');
-  $('start-btn').focus();
+  updateHome();
+  $(hasSession() ? 'resume-btn' : 'start-btn').focus();
 }
 
 function shuffle(arr) {
@@ -44,8 +96,9 @@ function initVoice() {
 }
 
 function speakQuestion(vehicle) {
-  // Standard spelling helps the engine recognize words; the UI stays child-friendly.
-  speak(`${vehicle.speechName || vehicle.name}は、どこかな？`);
+  // Explicit kana avoids engine-dependent kanji readings (for example 車 → くるま).
+  // Keep the complete question in one utterance so replay and initial playback match.
+  speak(`${vehicle.speechName}は、どこかな？`);
 }
 
 function playPinpon() {
@@ -87,7 +140,7 @@ async function loadVehicles() {
   const res = await fetch('data/vehicles.json');
   if (!res.ok) throw new Error('vehicles.json の読み込みに失敗しました');
   const data = await res.json();
-  if (!Array.isArray(data) || data.length < QUESTION_COUNT || data.some(v => !v.id || !v.name || !v.image) || new Set(data.map(v => v.id)).size !== data.length) throw new Error('車データを確認してください');
+  if (!Array.isArray(data) || data.length < QUESTION_COUNT || data.some(v => !v.id || !v.name || !v.image || typeof v.speechName !== 'string' || !/^[ァ-ヺー・]+$/.test(v.speechName)) || new Set(data.map(v => v.id)).size !== data.length) throw new Error('車データを確認してください');
   await Promise.all(data.map(v => new Promise(resolve => {
     const img = new Image();
     img.onload = () => resolve();
@@ -101,8 +154,10 @@ async function loadVehicles() {
 function generateQuiz(allVehicles, count) {
   if (allVehicles.length < count) throw new Error(`車データが${count}件未満です`);
   if (allVehicles.length < 4) throw new Error('選択肢が4枚必要です');
-  const pool = shuffle(allVehicles);
-  const correctVehicles = pool.slice(0, count);
+  const familiarIds = new Set(['patoka', 'bus', 'kyukyusha', 'shovelcar', 'dump_car', 'taxi', 'hashigosha']);
+  const familiar = shuffle(allVehicles.filter(v => familiarIds.has(v.id)));
+  const first = familiar[0] || shuffle(allVehicles)[0];
+  const correctVehicles = [first, ...shuffle(allVehicles.filter(v => v.id !== first.id)).slice(0, count - 1)];
   return correctVehicles.map(correct => {
     const others = shuffle(allVehicles.filter(v => v.id !== correct.id)).slice(0, 3);
     const choices = shuffle([correct, ...others]);
@@ -116,7 +171,18 @@ function renderQuestion(index) {
   document.getElementById('question-text').textContent = q.correct.name;
   $('question-count').textContent = `${index + 1} / ${questions.length}`;
   $('progress').setAttribute('aria-label', `${questions.length}もんちゅう ${index + 1}もんめ`);
-  $('progress').innerHTML = questions.map((_, i) => `<span class="progress-stop ${i < index ? 'done' : i === index ? 'current' : ''}" aria-hidden="true"></span>`).join('');
+  $('progress').replaceChildren();
+  questions.forEach((q, i) => {
+    const stop = document.createElement('span');
+    stop.className = `progress-stop ${i < index ? 'done' : i === index ? 'current' : ''}`;
+    stop.setAttribute('aria-hidden', 'true');
+    if (i < index) {
+      const img = document.createElement('img');
+      img.src = q.correct.image; img.alt = '';
+      stop.append(img);
+    } else stop.textContent = i === index ? '?' : '•';
+    $('progress').append(stop);
+  });
   $('feedback').textContent = 'これかな？と おもったら タッチ！';
 
   const grid = document.getElementById('vehicle-grid');
@@ -147,10 +213,14 @@ function renderQuestion(index) {
 
     card.appendChild(img);
     card.appendChild(label);
+    if (wrongIds.includes(vehicle.id)) {
+      card.classList.add('wrong'); card.disabled = true; label.textContent = vehicle.name;
+    }
     card.addEventListener('click', () => handleTap(vehicle.id));
     grid.appendChild(card);
   });
 
+  saveSession();
   $('question-text').focus({ preventScroll: true });
   speakQuestion(q.correct);
 }
@@ -164,6 +234,7 @@ function handleTap(tappedId) {
 
   if (tappedId === q.correct.id) {
     answered = true;
+    saveSession();
     window.speechSynthesis?.cancel();
     cards.forEach(c => c.disabled = true);
     tappedCard.classList.add('correct');
@@ -177,8 +248,10 @@ function handleTap(tappedId) {
     tappedCard.classList.add('wrong');
     tappedCard.querySelector('.card-label').textContent = vehicle.name;
     tappedCard.disabled = true;
+    wrongIds.push(tappedId);
+    saveSession();
     $('feedback').textContent = 'おしい！ ほかの くるまも みてみよう。';
-    speak('おしい。もう一度、探してみよう。');
+    if (wrongIds.length === 1) speak('おしい。もう一度、探してみよう。');
   }
 }
 
@@ -186,6 +259,7 @@ function showCorrectOverlay(name, image) {
   document.getElementById('correct-name').textContent = name;
   document.getElementById('correct-img').src = image;
   $('correct-img').alt = name;
+  $('found-count').textContent = `${currentIndex + 1} / ${questions.length} だい みつけた！`;
   $('next-btn').innerHTML = currentIndex === questions.length - 1 ? 'ゴールへ すすむ <span>★</span>' : 'つぎへ すすむ <span>▶</span>';
   document.getElementById('quiz-section').classList.add('hidden');
   document.getElementById('correct-overlay').classList.remove('hidden');
@@ -195,6 +269,8 @@ function showCorrectOverlay(name, image) {
 function hideCorrectOverlay() {
   document.getElementById('correct-overlay').classList.add('hidden');
   currentIndex++;
+  wrongIds = [];
+  saveSession();
   if (currentIndex >= questions.length) {
     showResult();
   } else {
@@ -213,15 +289,28 @@ function showResult() {
     img.alt = '';
     const caption = document.createElement('figcaption');
     caption.textContent = correct.name;
-    figure.append(img, caption);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'collection-vehicle';
+    button.setAttribute('aria-label', `${correct.name}の なまえを きく`);
+    button.append(img);
+    button.addEventListener('click', () => {
+      $('collection-feedback').textContent = correct.name;
+      speak(correct.speechName);
+    });
+    figure.append(button, caption);
     $('collection').append(figure);
   });
+  storeValue(SESSION_KEY, null);
+  $('collection-feedback').textContent = '';
+  updateSound();
   $('result-title').focus({ preventScroll: true });
   speak('全部見つけたね。よくできました！');
 }
 
 function startQuiz() {
   currentIndex = 0;
+  wrongIds = [];
   questions = generateQuiz(vehicles, QUESTION_COUNT);
   document.getElementById('home-section').classList.add('hidden');
   document.getElementById('quiz-section').classList.remove('hidden');
@@ -235,7 +324,8 @@ async function init() {
   $('start-btn').textContent = 'じゅんびちゅう…';
   try {
     vehicles = await loadVehicles();
-    $('start-btn').innerHTML = 'はじめる <span>▶</span>';
+    restoreSession();
+    updateHome();
     $('load-status').textContent = 'おとを きいて、くるまを タッチ。ぜんぶで 5もん！';
   } catch (e) {
     console.error(e);
@@ -245,11 +335,25 @@ async function init() {
   $('start-btn').disabled = false;
 }
 
+function updateSound() {
+    $('sound-btn').innerHTML = `おと ${muted ? 'OFF' : 'ON'} <span aria-hidden="true">♫</span>`;
+    $('sound-btn').setAttribute('aria-label', muted ? 'おとを出す' : 'おとを消す');
+    $('sound-btn').setAttribute('aria-pressed', String(muted));
+    $('speak-btn').disabled = muted || !window.speechSynthesis;
+    document.querySelector('.result-note').textContent = muted || !window.speechSynthesis
+      ? 'きょう みつけた くるまが そろったよ。'
+      : 'くるまを タッチすると、なまえが きけるよ。';
+    document.querySelectorAll('.collection-vehicle').forEach(button => button.disabled = muted || !window.speechSynthesis);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (window.speechSynthesis) {
     window.speechSynthesis.onvoiceschanged = initVoice;
     initVoice();
   }
+  muted = readStored(SOUND_KEY) === true;
+  updateSound();
+  $('resume-btn').addEventListener('click', resumeQuiz);
   $('start-btn').addEventListener('click', () => vehicles.length ? startQuiz() : init());
   $('speak-btn').addEventListener('click', () => {
     if (questions[currentIndex]) speakQuestion(questions[currentIndex].correct);
@@ -257,10 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('sound-btn').addEventListener('click', () => {
     muted = !muted;
     if (muted) window.speechSynthesis?.cancel();
-    $('sound-btn').innerHTML = `おと ${muted ? 'OFF' : 'ON'} <span aria-hidden="true">♫</span>`;
-    $('sound-btn').setAttribute('aria-label', muted ? 'おとを出す' : 'おとを消す');
-    $('sound-btn').setAttribute('aria-pressed', String(muted));
-    $('speak-btn').disabled = muted;
+    storeValue(SOUND_KEY, muted);
+    updateSound();
   });
   $('next-btn').addEventListener('click', () => { if (answered && !$('correct-overlay').classList.contains('hidden')) hideCorrectOverlay(); });
   $('replay-btn').addEventListener('click', startQuiz);

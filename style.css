@@ -550,3 +550,47 @@ body:has(.home-screen:not(.hidden)) {
   .home-screen .btn-primary { min-width: min(290px, 100%); font-size: 26px; min-height: 74px; }
   .home-screen .parent-note { margin-top: 24px; }
 }
+
+/* Collected vehicles show real progress, without scores or penalties. */
+.progress-stop {
+  width: 42px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 9px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.progress-stop.done { background: white; border: 2px solid var(--green); }
+.progress-stop.current { color: var(--ink); }
+.progress-stop img { width: 100%; height: 100%; object-fit: contain; }
+.found-count { color: var(--green); font-size: 14px; font-weight: 700; margin: 14px 0 0; }
+.collection-vehicle {
+  display: block;
+  width: 100%;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 4px;
+  background: white;
+}
+.collection-vehicle:not(:disabled):hover { border-color: var(--blue); }
+.collection-vehicle:not(:disabled)::after { content: '♫ なまえを きく'; display: block; color: var(--blue); font-size: 12px; font-weight: 700; margin-top: 6px; }
+.collection-feedback { min-height: 24px; color: var(--blue); font-weight: 700; margin: 8px 0; }
+.together-note { color: var(--muted); font-size: 15px; margin: 8px 0 24px; }
+.home-screen .secondary-start {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-size: 16px;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 10px;
+}
+#resume-note:empty { display: none; }
+.speak-btn:disabled { opacity: .45; }
+@media (max-width: 600px) {
+  .progress-stop { width: 30px; height: 28px; border-radius: 7px; }
+  .progress-track { gap: 4px; }
+  .collection figcaption { font-size: 12px; }
+}

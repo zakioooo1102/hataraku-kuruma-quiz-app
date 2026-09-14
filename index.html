@@ -14,6 +14,7 @@
     <section id="home-section" class="home-screen" aria-labelledby="home-title">
       <div class="home-copy"><p class="intro">きみの すきな くるまは どれ？</p><h1 id="home-title">はたらくくるま<span>クイズ</span></h1></div>
       <div class="vehicle-illustration"><img src="images/home-vehicles.png" alt="黄色いショベルカー、赤いはしご車、白い救急車のイラスト" width="1536" height="1024" fetchpriority="high"></div>
+      <button id="resume-btn" class="btn btn-primary hidden">つづきから あそぶ <span>▶</span></button><p id="resume-note" class="home-note"></p>
       <button id="start-btn" class="btn btn-primary" disabled>じゅんびちゅう…</button><p id="load-status" class="home-note" role="status">おとを きいて、くるまを タッチ。ぜんぶで 5もん！</p>
       <p class="parent-note">おうちの方へ：文字が読めなくても、音声で遊べます。</p>
     </section>
@@ -22,10 +23,10 @@
       <div class="quiz-header"><div><p class="question-hint">どーこだ？</p><h1 id="question-text" tabindex="-1"></h1></div><button id="speak-btn" class="speak-btn" aria-label="もういちど きく">♫<small>きく</small></button></div>
       <div id="vehicle-grid" class="vehicle-grid"></div><p id="feedback" class="feedback" role="status">これかな？と おもったら タッチ！</p>
     </section>
-    <section id="correct-overlay" class="correct-screen hidden" aria-labelledby="correct-label"><div class="success-badge" aria-hidden="true">✓</div><h1 id="correct-label" tabindex="-1">せいかい！</h1><p class="success-note">みつけたね！</p><div class="found-vehicle"><img id="correct-img" alt=""><h2 id="correct-name"></h2></div><button id="next-btn" class="btn btn-primary">つぎへ すすむ <span>▶</span></button></section>
-    <section id="result-section" class="result-screen hidden" aria-labelledby="result-title"><div class="result-stars" aria-hidden="true">★ ★ ★</div><p class="intro">ぜんぶ みつけたね！</p><h1 id="result-title" tabindex="-1">よくできました！</h1><p class="result-note">きょうの くるまが そろったよ。</p><div id="collection" class="collection"></div><button id="replay-btn" class="btn btn-primary">もういちど あそぶ <span>↻</span></button><button id="home-btn" class="text-btn">⌂ はじめに もどる</button></section>
+    <section id="correct-overlay" class="correct-screen hidden" aria-labelledby="correct-label"><div class="success-badge" aria-hidden="true">✓</div><h1 id="correct-label" tabindex="-1">せいかい！</h1><p class="success-note">みつけたね！</p><p id="found-count" class="found-count"></p><div class="found-vehicle"><img id="correct-img" alt=""><h2 id="correct-name"></h2></div><button id="next-btn" class="btn btn-primary">つぎへ すすむ <span>▶</span></button></section>
+    <section id="result-section" class="result-screen hidden" aria-labelledby="result-title"><div class="result-stars" aria-hidden="true">★ ★ ★</div><p class="intro">ぜんぶ みつけたね！</p><h1 id="result-title" tabindex="-1">よくできました！</h1><p class="result-note">くるまを タッチすると、なまえが きけるよ。</p><div id="collection" class="collection"></div><p id="collection-feedback" class="collection-feedback" role="status"></p><p class="together-note">おそとで みた くるまは あるかな？</p><button id="replay-btn" class="btn btn-primary">もういちど あそぶ <span>↻</span></button><button id="home-btn" class="text-btn">⌂ はじめに もどる</button></section>
   </main>
-  <dialog id="exit-dialog"><h2>ひとやすみ する？</h2><p>はじめに もどると、あたらしい もんだいになるよ。</p><button id="continue-btn" class="btn btn-primary">つづける</button><button id="exit-btn" class="text-btn">はじめに もどる</button></dialog>
+  <dialog id="exit-dialog"><h2>ひとやすみ する？</h2><p>つづきは とっておくよ。いつでも もどってきてね。</p><button id="continue-btn" class="btn btn-primary">つづける</button><button id="exit-btn" class="text-btn">ひとやすみ する</button></dialog>
   <script src="app.js"></script>
 </body>
 </html>
